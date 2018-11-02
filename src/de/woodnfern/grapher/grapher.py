@@ -10,6 +10,20 @@ def perform_allpages_query(endpoint, payload):
     return results
 
 
+def get_links_from_article(page_id, article_name):
+    links = {}
+    payload = {\
+        "action": "query",\
+        "list": "allpages",\
+        "titles": article_name,\
+        "pllimit": 500,\
+        "prop": "links",\
+        "format": "json"}
+    r = requests.get(endpoint, params=payload)
+    links = r.json()["query"]["pages"][str(page_id)][links]
+    plcontinue = r.json()["continue"]["plcontinue"]
+
+
 def crawl(endpoint):
     pages = {}
     last_title = ""
