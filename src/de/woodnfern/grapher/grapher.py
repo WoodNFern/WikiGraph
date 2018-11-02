@@ -12,19 +12,26 @@ def perform_allpages_query(endpoint, payload):
 
 def crawl(endpoint):
     pages = {}
-    payload = {"action": "query", "list": "allpages", "aplimit": 500, "format": "json"}
     last_title = ""
+    payload = {"action": "query", "list": "allpages", "aplimit": 500, "apfrom": last_title, "format": "json"}
     results = perform_allpages_query(endpoint, payload)
 
     while len(results) is not 0:
+        requested_title = last_title
+        # Process results
         for page in results:
             page_id = page["pageid"]
             page_title = page["title"]
             pages[page_id] = page_title
             last_title = page_title
-        payload["apfrom"] = last_title
-        print("Starting next query from: " + str(last_title))
-        results = perform_allpages_query(endpoint, payload)
+
+        # Continue, if not requesting same article again
+        if last_title != requested_title:
+            payload["apfrom"] = last_title
+            print("Starting next query from: " + str(last_title))
+            results = perform_allpages_query(endpoint, payload)
+        else:
+            return pages
     return pages
 
 
